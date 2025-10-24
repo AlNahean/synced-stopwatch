@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +12,9 @@ export async function POST(request: Request) {
     if (!stopwatch) {
       stopwatch = await prisma.stopwatch.create({ data: { id: "singleton" } });
     }
+
+    let logAction: string = action.toUpperCase();
+    let logDetails: string | undefined = undefined;
 
     switch (action) {
       case "start":
@@ -30,10 +33,7 @@ export async function POST(request: Request) {
         const elapsedTime = BigInt(Date.now() - stopwatch.startTime.getTime());
         await prisma.stopwatch.update({
           where: { id: "singleton" },
-          data: {
-            isRunning: false,
-            elapsedTime: elapsedTime,
-          },
+          data: { isRunning: false, elapsedTime },
         });
         break;
 
@@ -44,11 +44,9 @@ export async function POST(request: Request) {
             { status: 400 }
           );
         await prisma.lap.create({
-          data: {
-            stopwatchId: "singleton",
-            time: BigInt(currentTime),
-          },
+          data: { stopwatchId: "singleton", time: BigInt(currentTime) },
         });
+        logDetails = `Time: ${currentTime}ms`;
         break;
 
       case "reset":
@@ -68,6 +66,15 @@ export async function POST(request: Request) {
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
+
+    // Create an activity log for the action
+    await prisma.activityLog.create({
+      data: {
+        stopwatchId: "singleton",
+        action: logAction,
+        details: logDetails,
+      },
+    });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

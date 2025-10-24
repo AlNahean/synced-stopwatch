@@ -1,11 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { Button, cn, useTheme } from 'heroui-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, View, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppText } from '@/components/app-text';
-import { getStopwatchState } from '../../lib/api';
-import io, { Socket } from 'socket.io-client';
+import { AppText } from '../../components/app-text';
+import { getStopwatchState, syncStopwatchAction } from '../../lib/api';
 
 type Lap = {
     id: string;
@@ -37,55 +36,37 @@ const formatTime = (time: number) => {
     return `${minutesString}:${secondsString}.${millisecondsString}`;
 };
 
-// IMPORTANT: Replace with your local IP address
-const SOCKET_URL = 'http://YOUR_LOCAL_IP:3000';
-let socket: Socket;
-
 export default function StopwatchScreen() {
     const [time, setTime] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [laps, setLaps] = useState<number[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [demoTimeIndex, setDemoTimeIndex] = useState(0);
 
     const { colors } = useTheme();
     const insets = useSafeAreaInsets();
 
-    const updateStateFromServer = (data: StopwatchState) => {
-        if (timerRef.current) clearInterval(timerRef.current);
-
-        const elapsedTime = Number(data.elapsedTime);
-        setIsRunning(data.isRunning);
-        setLaps(data.laps.map(lap => Number(lap.time)));
-
-        if (data.isRunning) {
-            const startTime = new Date(data.startTime).getTime();
-            const initialTime = Date.now() - startTime;
-            setTime(initialTime);
-
-            timerRef.current = setInterval(() => {
-                setTime(Date.now() - startTime);
-            }, 10);
-        } else {
-            setTime(elapsedTime);
-        }
-    };
-
     useEffect(() => {
-        socket = io(SOCKET_URL);
-
-        socket.on('connect', () => {
-            console.log('Connected to WebSocket server from React Native');
-        });
-
-        socket.on('state_update', (data: StopwatchState) => {
-            updateStateFromServer(data);
-        });
-
         const fetchInitialState = async () => {
             try {
                 const data: StopwatchState = await getStopwatchState();
-                updateStateFromServer(data);
+
+                const elapsedTime = Number(data.elapsedTime);
+                setIsRunning(data.isRunning);
+                setLaps(data.laps.map(lap => Number(lap.time)));
+
+                if (data.isRunning) {
+                    const startTime = new Date(data.startTime).getTime();
+                    const initialTime = (Date.now() - startTime);
+                    setTime(initialTime);
+
+                    timerRef.current = setInterval(() => {
+                        setTime(Date.now() - startTime);
+                    }, 10);
+                } else {
+                    setTime(elapsedTime);
+                }
             } catch (error) {
                 console.error("Failed to fetch initial state:", error);
             } finally {
@@ -97,22 +78,21 @@ export default function StopwatchScreen() {
 
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
-            if (socket) socket.disconnect();
         };
     }, []);
 
     const handleStartPause = useCallback(() => {
-        setIsRunning(prev => {
-            const newIsRunning = !prev;
+        setIsRunning((prevIsRunning) => {
+            const newIsRunning = !prevIsRunning;
             if (newIsRunning) {
                 const startTime = Date.now() - time;
                 timerRef.current = setInterval(() => {
                     setTime(Date.now() - startTime);
                 }, 10);
-                socket.emit("action", { action: "start" });
+                syncStopwatchAction("start");
             } else {
                 if (timerRef.current) clearInterval(timerRef.current);
-                socket.emit("action", { action: "pause" });
+                syncStopwatchAction("pause");
             }
             return newIsRunning;
         });
@@ -121,7 +101,7 @@ export default function StopwatchScreen() {
     const handleLap = useCallback(() => {
         if (isRunning) {
             setLaps((prevLaps) => [time, ...prevLaps]);
-            socket.emit("action", { action: "lap", currentTime: time });
+            syncStopwatchAction("lap", { currentTime: time });
         }
     }, [isRunning, time]);
 
@@ -130,8 +110,23 @@ export default function StopwatchScreen() {
         setTime(0);
         setLaps([]);
         setIsRunning(false);
-        socket.emit("action", { action: "reset" });
+        syncStopwatchAction("reset");
     }, []);
+
+    const handleDemoButton = () => {
+        const demoTimes = [
+            3600000, // 1 hour
+            36000000, // 10 hours
+            360000000, // 100 hours
+            0, // reset
+        ];
+        setTime(demoTimes[demoTimeIndex]!);
+        setDemoTimeIndex((prevIndex) => (prevIndex + 1) % demoTimes.length);
+        if (isRunning) {
+            handleStartPause(); // Pause the timer
+        }
+        setLaps([]);
+    };
 
     const renderLap = useCallback(
         ({ item, index }: { item: number; index: number }) => {
@@ -157,7 +152,7 @@ export default function StopwatchScreen() {
         if (isLoading) {
             return (
                 <View className="items-center justify-center pt-16 pb-8 h-[300px]">
-                    <Feather name="loader" size={48} color={colors.foreground} className="animate-spin" />
+                    <ActivityIndicator size="large" color={colors.foreground} />
                 </View>
             )
         }
@@ -191,7 +186,7 @@ export default function StopwatchScreen() {
                         />
                     </Button>
                     <Button
-                        variant="warning"
+                        variant={isRunning ? 'warning' : 'success'}
                         className="w-28 h-28 rounded-full"
                         onPress={handleStartPause}
                     >
@@ -214,9 +209,16 @@ export default function StopwatchScreen() {
                         />
                     </Button>
                 </View>
+                {__DEV__ && (
+                    <View className="items-center mb-8">
+                        <Button variant="ghost" size="sm" onPress={handleDemoButton}>
+                            <Button.Label>Demo Hour+</Button.Label>
+                        </Button>
+                    </View>
+                )}
             </>
         );
-    }, [time, isRunning, isLoading, handleStartPause, handleLap, handleReset, colors]);
+    }, [time, isRunning, isLoading, handleStartPause, handleLap, handleReset, colors, demoTimeIndex]);
 
     return (
         <View

@@ -14,12 +14,13 @@ datasource db {
 }
 
 model Stopwatch {
-  id          String   @id @default("singleton")
-  isRunning   Boolean  @default(false)
-  startTime   DateTime @default(now())
-  elapsedTime BigInt   @default(0) // Stored as milliseconds
+  id          String        @id @default("singleton")
+  isRunning   Boolean       @default(false)
+  startTime   DateTime      @default(now())
+  elapsedTime BigInt        @default(0) // Stored as milliseconds
   laps        Lap[]
-  updatedAt   DateTime @updatedAt
+  activities  ActivityLog[]
+  updatedAt   DateTime      @updatedAt
 }
 
 model Lap {
@@ -27,5 +28,14 @@ model Lap {
   stopwatchId String
   stopwatch   Stopwatch @relation(fields: [stopwatchId], references: [id])
   time        BigInt
+  createdAt   DateTime  @default(now())
+}
+
+model ActivityLog {
+  id          String    @id @default(cuid())
+  stopwatchId String
+  stopwatch   Stopwatch @relation(fields: [stopwatchId], references: [id])
+  action      String // e.g., START, PAUSE, LAP, RESET
+  details     String? // e.g., Lap time
   createdAt   DateTime  @default(now())
 }

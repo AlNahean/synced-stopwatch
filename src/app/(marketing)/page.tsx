@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RotateCcw, Play, Pause, Flag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import io, { Socket } from "socket.io-client";
 
 type Lap = {
   id: string;
@@ -37,8 +36,6 @@ const formatTime = (time: number) => {
   return `${minutesString}:${secondsString}.${millisecondsString}`;
 };
 
-let socket: Socket;
-
 export default function Home() {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -46,91 +43,85 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const updateStateFromServer = (data: StopwatchState) => {
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    const elapsedTime = Number(data.elapsedTime);
-    setIsRunning(data.isRunning);
-    setLaps(data.laps.map(lap => Number(lap.time)));
-
-    if (data.isRunning) {
-      const startTime = new Date(data.startTime).getTime();
-      const initialTime = Date.now() - startTime;
-      setTime(initialTime);
-
-      timerRef.current = setInterval(() => {
-        setTime(Date.now() - startTime);
-      }, 10);
-    } else {
-      setTime(elapsedTime);
+  const syncState = async (action: string, body?: object) => {
+    try {
+      await fetch("/api/stopwatch/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...body }),
+      });
+    } catch (error) {
+      console.error(`Failed to sync action '${action}':`, error);
     }
   };
 
   useEffect(() => {
-    const socketInitializer = async () => {
-      await fetch('/api/socket');
-      socket = io();
-
-      socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
-      });
-
-      socket.on('state_update', (data: StopwatchState) => {
-        updateStateFromServer(data);
-      });
-    };
-
     const fetchInitialState = async () => {
       try {
         const response = await fetch("/api/stopwatch");
         const data: StopwatchState = await response.json();
-        updateStateFromServer(data);
+
+        const elapsedTime = Number(data.elapsedTime);
+        setIsRunning(data.isRunning);
+        setLaps(data.laps.map(lap => Number(lap.time)));
+
+        if (data.isRunning) {
+          const startTime = new Date(data.startTime).getTime();
+          const initialTime = Date.now() - startTime;
+          setTime(initialTime);
+
+          timerRef.current = setInterval(() => {
+            setTime(Date.now() - startTime);
+          }, 10);
+        } else {
+          setTime(elapsedTime);
+        }
       } catch (error) {
         console.error("Failed to fetch initial state:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    socketInitializer();
     fetchInitialState();
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (socket) socket.disconnect();
     };
   }, []);
 
   const handleStartPause = useCallback(() => {
-    // Optimistic update
-    setIsRunning(prev => !prev);
     if (isRunning) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      socket.emit("action", { action: "pause" });
+      // Pause
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      setIsRunning(false);
+      syncState("pause");
     } else {
+      // Start/Resume
       const startTime = Date.now() - time;
       timerRef.current = setInterval(() => {
         setTime(Date.now() - startTime);
       }, 10);
-      socket.emit("action", { action: "start" });
+      setIsRunning(true);
+      syncState("start");
     }
   }, [isRunning, time]);
 
   const handleLap = useCallback(() => {
     if (isRunning) {
-      // Optimistic update
       setLaps((prevLaps) => [time, ...prevLaps]);
-      socket.emit("action", { action: "lap", currentTime: time });
+      syncState("lap", { currentTime: time });
     }
   }, [isRunning, time]);
 
   const handleReset = useCallback(() => {
-    // Optimistic update
     if (timerRef.current) clearInterval(timerRef.current);
     setTime(0);
     setLaps([]);
     setIsRunning(false);
-    socket.emit("action", { action: "reset" });
+    syncState("reset");
   }, []);
 
   const isHourReached = time >= 3600000;

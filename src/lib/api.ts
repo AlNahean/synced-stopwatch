@@ -8,3 +8,16 @@ export const getStopwatchState = async () => {
   }
   return response.json();
 };
+
+export const syncStopwatchAction = async (action: string, body?: object) => {
+  try {
+    await fetch(`${API_URL}/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, ...body }),
+    });
+  } catch (error) {
+    console.error(`Failed to sync action '${action}':`, error);
+    // Optionally, handle sync errors here (e.g., show a toast message)
+  }
+};
