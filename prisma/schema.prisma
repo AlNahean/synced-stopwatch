@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Stopwatch {
+  id          String   @id @default("singleton")
+  isRunning   Boolean  @default(false)
+  startTime   DateTime @default(now())
+  elapsedTime BigInt   @default(0) // Stored as milliseconds
+  laps        Lap[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Lap {
+  id          String    @id @default(cuid())
+  stopwatchId String
+  stopwatch   Stopwatch @relation(fields: [stopwatchId], references: [id])
+  time        BigInt
+  createdAt   DateTime  @default(now())
+}
