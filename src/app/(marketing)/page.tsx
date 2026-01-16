@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RotateCcw, Play, Pause, Flag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Lap = {
   id: string;
@@ -124,70 +125,98 @@ export default function Home() {
     syncState("reset");
   }, []);
 
-  const isHourReached = time >= 3600000;
-
   return (
-    <div className="container mx-auto py-10 flex justify-center">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Stopwatch</CardTitle>
+    <div className="container mx-auto py-6 sm:py-10 px-4 flex justify-center min-h-[calc(100vh-4rem)] items-center sm:items-start">
+      <Card className="w-full max-w-lg sm:max-w-xl md:max-w-2xl shadow-xl border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl sm:text-2xl text-center font-bold tracking-tight">Stopwatch</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center">
+        <CardContent className="flex flex-col items-center p-4 sm:p-6">
           {isLoading ? (
             <div className="flex justify-center items-center h-[300px]">
-              <Loader2 className="h-12 w-12 animate-spin" />
+              <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <>
-              <div className="items-center justify-center pt-8 pb-4">
-                <p className={cn("font-bold text-foreground tabular-nums", isHourReached ? 'text-7xl' : 'text-8xl')}>
+              {/* Timer Display */}
+              <div className="flex items-center justify-center py-8 sm:py-12 w-full overflow-hidden">
+                <p
+                  className={cn(
+                    "font-mono font-bold text-foreground tabular-nums tracking-tighter leading-none select-none",
+                    // Use viewport width (vw) for mobile to prevent cutoff, fixed size for larger screens
+                    "text-[15vw] sm:text-7xl md:text-8xl"
+                  )}
+                >
                   {formatTime(time)}
                 </p>
               </div>
 
-              <div className="w-full flex-row justify-around items-center my-8 px-4 flex">
+              {/* Controls */}
+              <div className="w-full flex flex-row justify-center items-center gap-4 sm:gap-8 mb-8">
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="w-20 h-20 rounded-full"
+                  size="icon"
+                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 hover:bg-muted active:scale-95 transition-all shrink-0"
                   onClick={handleReset}
                   disabled={time === 0 && !isRunning}
+                  aria-label="Reset"
                 >
-                  <RotateCcw size={24} />
+                  <RotateCcw className="h-6 w-6 sm:h-8 sm:w-8" />
                 </Button>
 
                 <Button
                   variant={isRunning ? "destructive" : "default"}
-                  className="w-28 h-28 rounded-full"
+                  size="icon"
+                  className={cn(
+                    "h-24 w-24 sm:h-28 sm:w-28 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all shrink-0",
+                    isRunning ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
+                  )}
                   onClick={handleStartPause}
+                  aria-label={isRunning ? "Pause" : "Start"}
                 >
-                  {isRunning ? <Pause size={32} /> : <Play size={32} />}
+                  {isRunning ? (
+                    <Pause className="h-10 w-10 sm:h-12 sm:w-12 fill-current" />
+                  ) : (
+                    <Play className="h-10 w-10 sm:h-12 sm:w-12 fill-current ml-1" />
+                  )}
                 </Button>
 
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="w-20 h-20 rounded-full"
+                  size="icon"
+                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 hover:bg-muted active:scale-95 transition-all shrink-0"
                   onClick={handleLap}
                   disabled={!isRunning || time === 0}
+                  aria-label="Lap"
                 >
-                  <Flag size={24} />
+                  <Flag className="h-6 w-6 sm:h-8 sm:w-8" />
                 </Button>
               </div>
 
-              <div className="w-full mt-4">
-                <ul className="space-y-2">
-                  {laps.map((lap, index) => {
-                    const previousLap = laps[index + 1] || 0;
-                    const lapTime = lap - previousLap;
-                    return (
-                      <li key={index} className="flex justify-between items-center py-2 px-3 bg-muted/50 rounded-md">
-                        <span className="text-muted-foreground">Lap {laps.length - index}</span>
-                        <span className="text-foreground tabular-nums">{formatTime(lapTime)}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
+              {/* Laps List */}
+              <div className="w-full mt-2">
+                {laps.length > 0 && (
+                  <div className="flex items-center justify-between px-4 pb-2 text-sm font-medium text-muted-foreground border-b mb-2">
+                    <span>Lap No.</span>
+                    <span>Split Time</span>
+                  </div>
+                )}
+                <ScrollArea className={cn("w-full rounded-md transition-all duration-300", laps.length > 0 ? "h-64 sm:h-72 border bg-muted/20" : "h-0")}>
+                  <ul className="divide-y divide-border/50">
+                    {laps.map((lap, index) => {
+                      const previousLap = laps[index + 1] || 0;
+                      const lapTime = lap - previousLap;
+                      const lapNumber = laps.length - index;
+
+                      return (
+                        <li key={index} className="flex justify-between items-center py-3 px-4 hover:bg-muted/50 transition-colors text-sm sm:text-base">
+                          <span className="font-medium text-muted-foreground">Lap {lapNumber}</span>
+                          <span className="font-mono text-foreground tabular-nums font-semibold">{formatTime(lapTime)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </ScrollArea>
               </div>
             </>
           )}
