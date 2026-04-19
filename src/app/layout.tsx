@@ -75,11 +75,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
 
 
-          <SiteHeader />
+          {/* <SiteHeader /> */}
           <>
             {children}
           </>
-          <SiteFooter />
+          {/* <SiteFooter /> */}
         </ThemeProvider>
       </body>
     </html>
