@@ -44,10 +44,10 @@ export default function YearProgressPage() {
     if (!now || !stats) return <div className="h-screen bg-black" />;
 
     return (
-        <main className="fixed inset-0 bg-[#000000] text-white flex flex-col p-5 md:p-10 lg:p-16 overflow-hidden select-none antialiased">
+        <main className="fixed inset-0 bg-[#000000] text-white flex flex-col p-5 md:p-10 lg:p-16 pb-28 sm:pb-32 overflow-hidden select-none antialiased">
 
-            {/* HEADER: Protected Space */}
-            <header className="flex-none mb-2 md:mb-6">
+            {/* HEADER: Shielded Space */}
+            <header className="flex-none mb-6 md:mb-12 bg-black/80 backdrop-blur-sm z-10 relative">
                 <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-[#444] uppercase">
                     ANNUAL.CYCLE.PROGRESS
                 </p>
@@ -63,19 +63,18 @@ export default function YearProgressPage() {
                     </h1>
                 </div>
 
-                <p className="font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-[#222] uppercase mt-2">
+                <p className="font-mono text-[8px] md:text-[9px] tracking-[0.5em] text-[#444] uppercase mt-4">
                     END_OF_CYCLE_{stats.year}
                 </p>
             </header>
 
-            {/* GRID SECTION: Flexible container that shrinks contents to fit height */}
-            <section className="flex-1 min-h-0 w-full flex items-center justify-center">
+            {/* GRID SECTION: Contained to prevent overflow */}
+            <section className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden relative">
                 <div
                     className={`
             grid w-full h-full content-center justify-items-center
-            /* Mobile: 15 Cols (Makes grid shorter to avoid overlap) */
+            /* Mobile: 15 Cols (Shallow grid) */
             grid-cols-15 md:grid-cols-25 lg:grid-cols-45
-            /* Minimal gap */
             gap-1 lg:gap-2
           `}
                 >
@@ -85,12 +84,12 @@ export default function YearProgressPage() {
                         const isToday = dayNumber === stats.dayOfYear;
 
                         return (
-                            <div
+                             <div
                                 key={i}
                                 className={`
                   aspect-square rounded-full w-full
-                  /* DOT SIZING: Height-based sizing (vh) prevents the "Tower" from hitting the footer */
-                  max-w-[min(2.1vh,22px)]
+                  /* DOT SIZING: Reduced for better negative space */
+                  max-w-[min(1.8vh,20px)]
                   
                   ${isPast ? 'bg-white' : ''}
                   ${isToday ? 'bg-[#FF4500]' : ''}
@@ -102,25 +101,20 @@ export default function YearProgressPage() {
                 </div>
             </section>
 
-            {/* FOOTER SECTION: Protected Space */}
-            <footer className="flex-none flex justify-between items-end border-t border-[#111] pt-4 md:pt-8 mt-2">
-                <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full border border-[#222] flex items-center justify-center text-[10px] text-white font-bold shrink-0">
-                        N
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-mono text-sm md:text-xl font-bold tracking-widest leading-none">
-                            {stats.time}
-                        </span>
-                        <p className="font-mono text-[9px] md:text-[10px] tracking-[0.3em] text-[#444] mt-1">
-                            {stats.dateLabel} // {stats.year}
-                        </p>
-                    </div>
+            {/* FOOTER SECTION: Shielded Space */}
+            <footer className="flex-none flex justify-between items-end border-t border-[#111] pt-6 mt-4 bg-black/80 backdrop-blur-sm z-10 relative">
+                <div className="flex flex-col">
+                    <span className="font-mono text-sm md:text-xl font-bold tracking-widest leading-none">
+                        {stats.time}
+                    </span>
+                    <p className="font-mono text-[8px] md:text-[9px] tracking-[0.4em] text-[#444] mt-2 uppercase">
+                        {stats.dateLabel} // {stats.year}
+                    </p>
                 </div>
 
-                <div className="text-right font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-[#333] space-y-0.5">
-                    <p>STATUS: <span className="text-white">ACTIVE</span></p>
-                    <p>CORE_SYSTEM_V1.0.4</p>
+                <div className="text-right font-mono text-[8px] md:text-[9px] tracking-[0.3em] text-[#444] space-y-1 uppercase">
+                    <p>STATUS: <span className="text-[#777]">ACTIVE</span></p>
+                    <p className="opacity-60">CORE_SYSTEM_V1.0.4</p>
                 </div>
             </footer>
 

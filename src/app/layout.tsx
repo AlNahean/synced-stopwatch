@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import type { Metadata } from "next";
 
 import { ThemeProvider } from '@/components/theme/theme-provider'
+import { ChronoNav } from '@/components/common/chrono-nav'
 import { SiteHeader } from '@/components/common/site-header'
 import { SiteFooter } from '@/components/common/site-footer'
 import { siteConfig } from "@/config/site"
@@ -75,11 +76,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
 
 
-          {/* <SiteHeader /> */}
-          <>
+          <ChronoNav />
+          <main className="relative flex-1">
             {children}
-          </>
-          {/* <SiteFooter /> */}
+          </main>
         </ThemeProvider>
       </body>
     </html>
