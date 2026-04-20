@@ -51,14 +51,14 @@ export default function DayProgressPage() {
         };
     }, [now]);
 
-    if (!now || !stats) return <div className="h-screen bg-black" />;
+    if (!now || !stats) return <div className="h-screen bg-background" />;
 
     return (
-        <main className="fixed inset-0 bg-[#000000] text-white flex flex-col p-5 sm:p-8 md:p-12 lg:p-16 pb-28 sm:pb-32 overflow-hidden select-none antialiased">
+        <main className="fixed inset-0 bg-background text-foreground flex flex-col p-5 sm:p-8 md:p-12 lg:p-16 pb-28 sm:pb-32 overflow-hidden select-none antialiased">
 
             {/* HEADER: Shielded Space */}
-            <header className="flex-none mb-6 md:mb-10 bg-black/80 backdrop-blur-sm z-10 relative">
-                <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-[#444] uppercase">
+            <header className="flex-none mb-6 md:mb-10 bg-background/80 backdrop-blur-sm z-10 relative">
+                <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-muted-foreground/60 uppercase">
                     DAILY.CHRONO.PROGRESS
                 </p>
 
@@ -68,15 +68,15 @@ export default function DayProgressPage() {
                     </h1>
                     <h2 className="text-[clamp(1.5rem,5vw,3.5rem)] font-black tracking-tighter leading-none uppercase">
                         <span className="text-[#FF4500]">{stats.remainingHours}H {stats.remainingMins}M</span>
-                        <span className="ml-3 hidden sm:inline text-[#222]">LEFT</span>
+                        <span className="ml-3 hidden sm:inline text-muted-foreground">LEFT</span>
                     </h2>
                 </div>
 
                 <div className="flex flex-wrap gap-2 sm:gap-4 mt-3">
-                    <p className="font-mono text-[8px] sm:text-[10px] tracking-[0.2em] text-[#333] uppercase">
+                    <p className="font-mono text-[8px] sm:text-[10px] tracking-[0.2em] text-muted-foreground/40 uppercase">
                         SEGMENT_RESOLUTION: 15_MIN
                     </p>
-                    <p className="font-mono text-[8px] sm:text-[10px] tracking-[0.2em] text-[#333] uppercase hidden xs:block">
+                    <p className="font-mono text-[8px] sm:text-[10px] tracking-[0.2em] text-muted-foreground/40 uppercase hidden xs:block">
                         CYCLE_ID: {now.getFullYear()}-{now.getMonth() + 1}-{now.getDate()}
                     </p>
                 </div>
@@ -102,9 +102,9 @@ export default function DayProgressPage() {
                                     className={`
                                         w-full aspect-square rounded-full
                                         transition-colors duration-500
-                                        ${isPast ? 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.1)]' : ''}
+                                        ${isPast ? 'bg-foreground/90 shadow-[0_0_10px_rgba(var(--foreground),0.1)]' : ''}
                                         ${isCurrent ? 'bg-[#FF4500] animate-pulse shadow-[0_0_15px_rgba(255,69,0,0.4)]' : ''}
-                                        ${!isPast && !isCurrent ? 'bg-[#121212] border border-[#1a1a1a]' : ''}
+                                        ${!isPast && !isCurrent ? 'bg-muted border border-border/50' : ''}
                                     `}
                                 />
                             </div>
@@ -114,20 +114,20 @@ export default function DayProgressPage() {
             </section>
 
             {/* FOOTER: Shielded Space */}
-            <footer className="flex-none z-10 flex justify-between items-end border-t border-[#111] pt-6 mt-4 bg-black/80 backdrop-blur-sm relative">
+            <footer className="flex-none z-10 flex justify-between items-end border-t border-border pt-6 mt-4 bg-background/80 backdrop-blur-sm relative">
                 <div className="flex flex-col">
-                    <span className="font-mono text-lg sm:text-2xl md:text-3xl font-bold tracking-[0.1em] leading-none text-white/90">
+                    <span className="font-mono text-lg sm:text-2xl md:text-3xl font-bold tracking-[0.1em] leading-none text-foreground/90">
                         {stats.time}
                     </span>
-                    <p className="font-mono text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.4em] text-[#444] mt-2 uppercase">
+                    <p className="font-mono text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.4em] text-muted-foreground/60 mt-2 uppercase">
                         {stats.dateLabel} // REMAINDER
                     </p>
                 </div>
-
-                <div className="text-right font-mono text-[8px] sm:text-[9px] md:text-[10px] tracking-[0.3em] text-[#444] space-y-1 hidden xs:block uppercase">
+ 
+                <div className="text-right font-mono text-[8px] sm:text-[9px] md:text-[10px] tracking-[0.3em] text-muted-foreground/40 space-y-1 hidden xs:block uppercase">
                     <p className="flex items-center justify-end gap-1.5 sm:gap-2">
                         <span className="w-1.2 h-1.2 rounded-full bg-[#FF4500] opacity-70" />
-                        SYSTEM: <span className="text-[#666] ml-1">SYNCED</span>
+                        SYSTEM: <span className="text-muted-foreground/60 ml-1">SYNCED</span>
                     </p>
                     <p className="opacity-50 text-[7px] tracking-[0.4em]">LATENCY: 0.0004ms // V.2.0.1</p>
                 </div>
@@ -136,7 +136,7 @@ export default function DayProgressPage() {
             {/* Layout Overrides */}
             <style jsx global>{`
                 body { 
-                    background: black; 
+                    background: var(--background); 
                     margin: 0; 
                     overflow: hidden; 
                     height: 100dvh; 

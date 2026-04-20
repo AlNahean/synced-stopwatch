@@ -41,14 +41,14 @@ export default function YearProgressPage() {
         };
     }, [now]);
 
-    if (!now || !stats) return <div className="h-screen bg-black" />;
-
+    if (!now || !stats) return <div className="h-screen bg-background" />;
+ 
     return (
-        <main className="fixed inset-0 bg-[#000000] text-white flex flex-col p-5 md:p-10 lg:p-16 pb-28 sm:pb-32 overflow-hidden select-none antialiased">
-
+        <main className="fixed inset-0 bg-background text-foreground flex flex-col p-5 md:p-10 lg:p-16 pb-28 sm:pb-32 overflow-hidden select-none antialiased">
+ 
             {/* HEADER: Shielded Space */}
-            <header className="flex-none mb-6 md:mb-12 bg-black/80 backdrop-blur-sm z-10 relative">
-                <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-[#444] uppercase">
+            <header className="flex-none mb-6 md:mb-12 bg-background/80 backdrop-blur-sm z-10 relative">
+                <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-muted-foreground/60 uppercase">
                     ANNUAL.CYCLE.PROGRESS
                 </p>
 
@@ -56,14 +56,14 @@ export default function YearProgressPage() {
                     <h1 className="text-[clamp(2rem,7vw,5rem)] font-black tracking-tighter leading-none">
                         {stats.percentage}%
                     </h1>
-                    <h1 className="text-[clamp(2rem,7vw,5rem)] font-black tracking-tighter leading-none uppercase">
+                    <h2 className="text-[clamp(2rem,7vw,5rem)] font-black tracking-tighter leading-none uppercase">
                         <span className="text-[#FF4500]">{stats.daysRemaining}</span>
-                        <span className="ml-2 hidden xs:inline">DAYS</span>
-                        <span className="ml-2 hidden md:inline text-white">REMAINING</span>
-                    </h1>
+                        <span className="ml-2 hidden xs:inline opacity-70">DAYS</span>
+                        <span className="ml-2 hidden md:inline text-muted-foreground">REMAINING</span>
+                    </h2>
                 </div>
 
-                <p className="font-mono text-[8px] md:text-[9px] tracking-[0.5em] text-[#444] uppercase mt-4">
+                <p className="font-mono text-[8px] md:text-[9px] tracking-[0.5em] text-muted-foreground/40 uppercase mt-4">
                     END_OF_CYCLE_{stats.year}
                 </p>
             </header>
@@ -87,13 +87,13 @@ export default function YearProgressPage() {
                              <div
                                 key={i}
                                 className={`
-                  aspect-square rounded-full w-full
+                  aspect-square rounded-full w-full shadow-sm
                   /* DOT SIZING: Reduced for better negative space */
                   max-w-[min(1.8vh,20px)]
                   
-                  ${isPast ? 'bg-white' : ''}
-                  ${isToday ? 'bg-[#FF4500]' : ''}
-                  ${!isPast && !isToday ? 'bg-[#151515]' : ''}
+                  ${isPast ? 'bg-foreground/90 shadow-[0_0_10px_rgba(var(--foreground),0.05)]' : ''}
+                  ${isToday ? 'bg-[#FF4500] shadow-[0_0_15px_rgba(255,69,0,0.3)]' : ''}
+                  ${!isPast && !isToday ? 'bg-muted border border-border/50' : ''}
                 `}
                             />
                         );
@@ -102,25 +102,25 @@ export default function YearProgressPage() {
             </section>
 
             {/* FOOTER SECTION: Shielded Space */}
-            <footer className="flex-none flex justify-between items-end border-t border-[#111] pt-6 mt-4 bg-black/80 backdrop-blur-sm z-10 relative">
+            <footer className="flex-none flex justify-between items-end border-t border-border pt-6 mt-4 bg-background/80 backdrop-blur-sm z-10 relative">
                 <div className="flex flex-col">
-                    <span className="font-mono text-sm md:text-xl font-bold tracking-widest leading-none">
+                    <span className="font-mono text-sm md:text-xl font-bold tracking-widest leading-none text-foreground/90">
                         {stats.time}
                     </span>
-                    <p className="font-mono text-[8px] md:text-[9px] tracking-[0.4em] text-[#444] mt-2 uppercase">
+                    <p className="font-mono text-[8px] md:text-[9px] tracking-[0.4em] text-muted-foreground/60 mt-2 uppercase">
                         {stats.dateLabel} // {stats.year}
                     </p>
                 </div>
-
-                <div className="text-right font-mono text-[8px] md:text-[9px] tracking-[0.3em] text-[#444] space-y-1 uppercase">
-                    <p>STATUS: <span className="text-[#777]">ACTIVE</span></p>
-                    <p className="opacity-60">CORE_SYSTEM_V1.0.4</p>
+ 
+                <div className="text-right font-mono text-[8px] md:text-[9px] tracking-[0.3em] text-muted-foreground/40 space-y-1 uppercase">
+                    <p>STATUS: <span className="text-muted-foreground/80">ACTIVE</span></p>
+                    <p className="opacity-60 text-[7px] tracking-[0.4em]">CORE_SYSTEM_V1.0.4</p>
                 </div>
             </footer>
 
             {/* Breakpoint Overrides for Custom Grids */}
             <style jsx global>{`
-        body { background: black; margin: 0; overflow: hidden; height: 100dvh; }
+        body { background: var(--background); margin: 0; overflow: hidden; height: 100dvh; }
         
         /* Mobile Grid */
         .grid-cols-15 { grid-template-columns: repeat(15, minmax(0, 1fr)) !important; }
