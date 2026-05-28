@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RotateCcw, Play, Pause, Flag, Loader2 } from "lucide-react";
+import { RotateCcw, Play, Pause, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type Lap = {
   id: string;
@@ -198,7 +194,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER: Minimalist Stats & Laps */}
+      {/* FOOTER: Minimalist Laps */}
       <footer className="flex-none z-10 flex justify-between items-end border-t border-border pt-8">
         <div className="flex flex-col gap-4 max-h-[15vh] overflow-y-auto no-scrollbar pr-4">
           {laps.slice(0, 3).map((lap, index) => (
@@ -222,9 +218,9 @@ export default function Home() {
         </div>
       </footer>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         body { background: var(--background); margin: 0; overflow: hidden; height: 100dvh; }
-      `}</style>
+      `}} />
     </main>
   );
-}
+}

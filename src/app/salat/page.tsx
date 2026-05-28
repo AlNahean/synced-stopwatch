@@ -633,7 +633,7 @@ export default function SalatPage() {
       </footer>
 
       {/* CUSTOM STYLE OVERRIDES */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         body { 
           background: var(--background); 
           margin: 0; 
@@ -648,7 +648,7 @@ export default function SalatPage() {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-      `}</style>
+      `}} />
     </main>
   );
 }

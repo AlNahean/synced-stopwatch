@@ -37,6 +37,7 @@ model ActivityLog {
   stopwatch   Stopwatch @relation(fields: [stopwatchId], references: [id])
   action      String // e.g., START, PAUSE, LAP, RESET
   details     String? // e.g., Lap time
+  comment     String? // Add comments to logs
   createdAt   DateTime  @default(now())
 }
 
