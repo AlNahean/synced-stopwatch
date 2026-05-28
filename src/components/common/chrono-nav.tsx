@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Timer, Calendar, CalendarDays, Settings, Sun, Moon } from "lucide-react";
+import { Timer, Calendar, CalendarDays, Settings, Sun, Moon, MoonStar } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +29,11 @@ const navItems = [
     icon: Calendar,
     label: "Yearly",
     href: "/year-calendar",
+  },
+  {
+    icon: MoonStar,
+    label: "Salat",
+    href: "/salat",
   },
 ];
 
