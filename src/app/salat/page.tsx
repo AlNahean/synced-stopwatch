@@ -286,7 +286,7 @@ export default function SalatPage() {
       <Toaster position="top-right" richColors />
       
       {/* HEADER SECTION */}
-      <header className="flex-none mb-6 sm:mb-8 md:mb-10 bg-background/80 backdrop-blur-sm z-10 sticky top-0 py-2 border-b border-border/50">
+      <header className="flex-none mb-6 sm:mb-8 md:mb-10 bg-background/80 backdrop-blur-sm z-10 relative py-2 border-b border-border/50 max-w-7xl mx-auto w-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p className="font-mono text-[9px] md:text-[11px] tracking-[0.4em] text-muted-foreground/60 uppercase">
@@ -634,6 +634,12 @@ export default function SalatPage() {
 
       {/* CUSTOM STYLE OVERRIDES */}
       <style jsx global>{`
+        body { 
+          background: var(--background); 
+          margin: 0; 
+          overflow: hidden; 
+          height: 100dvh; 
+        }
         /* Hide scrollbars but keep scrolling working */
         .no-scrollbar::-webkit-scrollbar {
           display: none;
