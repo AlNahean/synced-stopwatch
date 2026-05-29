@@ -9,7 +9,8 @@ import {
   Edit3, 
   FileDown, 
   ArrowLeft,
-  Loader2
+  Loader2,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,30 @@ export default function HistoryPage() {
       console.error("Error saving comment:", error);
       toast.error("Failed to save comment.");
       fetchActivities(); // Rollback
+    }
+  };
+
+  const handleClearHistory = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to clear all activity logs? This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      const res = await fetch("/api/stopwatch/activity", {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to clear history");
+
+      setActivities([]);
+      toast.success("Activity logs cleared.");
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      toast.error("Failed to clear history.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -192,14 +217,24 @@ Exported session record representing the historical timeline of stopwatch state 
             </div>
           </div>
 
-          <button
-            onClick={handleExportMDX}
-            disabled={loading || activities.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FF4500]/15 border border-[#FF4500]/25 rounded-full text-xs font-mono font-bold tracking-wider hover:bg-[#FF4500]/25 transition-all text-[#FF4500] disabled:opacity-30 disabled:pointer-events-none self-start sm:self-end"
-          >
-            <FileDown className="h-4 w-4" />
-            EXPORT TO MDX
-          </button>
+          <div className="flex items-center gap-2 self-start sm:self-end">
+            <button
+              onClick={handleClearHistory}
+              disabled={loading || activities.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-rose-500/15 border border-rose-500/25 rounded-full text-xs font-mono font-bold tracking-wider hover:bg-rose-500/25 transition-all text-rose-500 disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <Trash2 className="h-4 w-4" />
+              CLEAR HISTORY
+            </button>
+            <button
+              onClick={handleExportMDX}
+              disabled={loading || activities.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-[#FF4500]/15 border border-[#FF4500]/25 rounded-full text-xs font-mono font-bold tracking-wider hover:bg-[#FF4500]/25 transition-all text-[#FF4500] disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <FileDown className="h-4 w-4" />
+              EXPORT TO MDX
+            </button>
+          </div>
         </div>
       </header>
 

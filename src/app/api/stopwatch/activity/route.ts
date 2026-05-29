@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -39,3 +41,19 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function DELETE() {
+  try {
+    await prisma.activityLog.deleteMany({
+      where: { stopwatchId: "singleton" },
+    });
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error("Failed to clear activity log:", error);
+    return NextResponse.json(
+      { error: "Failed to clear activity log" },
+      { status: 500 }
+    );
+  }
+}
+
