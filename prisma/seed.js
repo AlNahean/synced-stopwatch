@@ -87,6 +87,87 @@ async function main() {
     });
   }
 
+  // 5. Seed Workout Progress Logs (last 60 days)
+  console.log("Seeding Workout Progress Logs (past 60 days)...");
+  await prisma.workoutProgress.deleteMany({});
+  
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    
+    // Realistic workout distribution: 50% hit exactly 1000 target, 30% partial, 20% rest days (0 reps)
+    const r = Math.random();
+    
+    let pullups = 0;
+    let pushups = 0;
+    let squats = 0;
+    let expander = 0;
+    let curls = 0;
+    let core = 0;
+    let grip = 0;
+
+    if (r < 0.5) {
+      // Completed (1000 reps)
+      pullups = 50;
+      pushups = 200;
+      squats = 250;
+      expander = 200;
+      curls = 150;
+      core = 150;
+      grip = Math.floor(Math.random() * 250);
+    } else if (r < 0.8) {
+      // Partial workout
+      pullups = Math.floor(Math.random() * 10) * 5; // steps of 5
+      pushups = Math.floor(Math.random() * 20) * 10;
+      squats = Math.floor(Math.random() * 25) * 10;
+      expander = Math.floor(Math.random() * 20) * 10;
+      curls = Math.floor(Math.random() * 15) * 10;
+      core = Math.floor(Math.random() * 15) * 10;
+      grip = Math.floor(Math.random() * 150);
+    }
+    
+    await prisma.workoutProgress.create({
+      data: {
+        date: dateStr,
+        pullups,
+        pushups,
+        squats,
+        expander,
+        curls,
+        core,
+        grip,
+      }
+    });
+  }
+
+  // 6. Seed Skincare Progress Logs (last 60 days)
+  console.log("Seeding Skincare Progress Logs (past 60 days)...");
+  await prisma.skincareProgress.deleteMany({});
+
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    
+    // Realistic skincare compliance (high probability of cleansing/moisturizing, matching twice a week matcha mask)
+    const dayOfWeek = d.getDay(); // 0 = Sunday, 3 = Wednesday (let's say matcha mask on Wed and Sun)
+    const isMatchaNight = (dayOfWeek === 0 || dayOfWeek === 3) && Math.random() < 0.9;
+
+    await prisma.skincareProgress.create({
+      data: {
+        date: dateStr,
+        cleanseM: Math.random() < 0.95,
+        moistM: Math.random() < 0.95,
+        protectM: Math.random() < 0.85,
+        lipsM: Math.random() < 0.8,
+        cleanseE: Math.random() < 0.9,
+        moistE: Math.random() < 0.9,
+        matchaMask: isMatchaNight,
+      }
+    });
+  }
+
   console.log("Seeding completed successfully!");
 }
 

@@ -53,3 +53,31 @@ model SalatProgress {
   updatedAt DateTime @updatedAt
 }
 
+model WorkoutProgress {
+  id        String   @id @default(cuid())
+  date      String   @unique // format: YYYY-MM-DD
+  pullups   Int      @default(0)
+  pushups   Int      @default(0)
+  squats    Int      @default(0)
+  expander  Int      @default(0)
+  curls     Int      @default(0)
+  core      Int      @default(0)
+  grip      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SkincareProgress {
+  id         String   @id @default(cuid())
+  date       String   @unique // format: YYYY-MM-DD
+  cleanseM   Boolean  @default(false)
+  moistM     Boolean  @default(false)
+  protectM   Boolean  @default(false)
+  lipsM      Boolean  @default(false)
+  cleanseE   Boolean  @default(false)
+  moistE     Boolean  @default(false)
+  matchaMask Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
