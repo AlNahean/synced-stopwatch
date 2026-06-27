@@ -44,13 +44,13 @@ type Exercise = {
 };
 
 const EXERCISES: Exercise[] = [
-    { id: "pullups", name: "Multi-Grip Pull-ups", target: 50, countsTowardsTotal: true },
-    { id: "pushups", name: "Deficit Push-ups", target: 200, countsTowardsTotal: true },
-    { id: "squats", name: "Dumbbell Goblet Squats", target: 250, countsTowardsTotal: true },
-    { id: "expander", name: "Chest Expander Pulls", target: 200, countsTowardsTotal: true },
+    { id: "pullups", name: "Pull-ups", target: 50, countsTowardsTotal: true },
+    { id: "pushups", name: "Push-ups", target: 200, countsTowardsTotal: true },
+    { id: "squats", name: "Dumbbell Squats", target: 250, countsTowardsTotal: true },
+    { id: "expander", name: "Spring Chest Expander", target: 200, countsTowardsTotal: true },
     { id: "curls", name: "Dumbbell Bicep Curls", target: 150, countsTowardsTotal: true },
-    { id: "core", name: "Floor Core/Crunches", target: 150, countsTowardsTotal: true },
-    { id: "grip", name: "Hand Gripper Squeezes", target: 200, countsTowardsTotal: false }, // Excluded from total
+    { id: "core", name: "Abs & Core", target: 150, countsTowardsTotal: true },
+    { id: "grip", name: "Hand Gripper", target: 200, countsTowardsTotal: false }, // Excluded from total
 ];
 
 type WorkoutData = {
@@ -664,19 +664,19 @@ export default function WorkoutPage() {
                                     {
                                         name: "Morning",
                                         reps: "300 Reps",
-                                        desc: "50 Deficit Pushups, 75 Goblet Squats, 50 Expander, 50 Bicep Curls, 50 Core, 25 Pullups",
+                                        desc: "50 Push-ups, 75 Dumbbell Squats, 50 Expander, 50 Bicep Curls, 50 Abs & Core, 25 Pull-ups",
                                         action: "morning"
                                     },
                                     {
                                         name: "Afternoon",
                                         reps: "400 Reps",
-                                        desc: "100 Deficit Pushups, 100 Goblet Squats, 75 Expander, 50 Bicep Curls, 50 Core, 25 Pullups",
+                                        desc: "100 Push-ups, 100 Dumbbell Squats, 75 Expander, 50 Bicep Curls, 50 Abs & Core, 25 Pull-ups",
                                         action: "afternoon"
                                     },
                                     {
                                         name: "Evening",
                                         reps: "300 Reps",
-                                        desc: "50 Deficit Pushups, 75 Goblet Squats, 75 Expander, 50 Bicep Curls, 50 Core",
+                                        desc: "50 Push-ups, 75 Dumbbell Squats, 75 Expander, 50 Bicep Curls, 50 Abs & Core",
                                         action: "evening"
                                     }
                                 ].map((session) => (
